@@ -16,7 +16,7 @@ describe('Persistent Node Chat Server', function() {
     });
     dbConnection.connect();
 
-       var tablename = ""; // TODO: fill this out
+       var tablename = "messages"; // TODO: fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
@@ -28,6 +28,7 @@ describe('Persistent Node Chat Server', function() {
   });
 
   it('Should insert posted messages to the DB', function(done) {
+
     // Post the user to the chat server.
     request({
       method: 'POST',
@@ -49,8 +50,9 @@ describe('Persistent Node Chat Server', function() {
 
         // TODO: You might have to change this test to get all the data from
         // your message table, since this is schema-dependent.
-        // var queryString = 'SELECT * FROM messages';
-        var queryString = 'INSERT ' + message +','+ createdAt + '(SELECT roomid FROM room where roomname ='+roomName+ ') INTO messages(message, createdat, roomid )';
+
+        var queryString = 'SELECT message FROM messages';
+        // var queryString = 'INSERT ' + message +','+ createdAt + '(SELECT roomid FROM room where roomname ='+roomName+ ') INTO messages(message, createdat, roomid )';
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {

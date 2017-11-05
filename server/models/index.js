@@ -3,7 +3,7 @@ var db = require('../db');
 module.exports = {
   messages: {
     get: function (callback) { // a function which produces all the messages
-      var sql = 'SELECT messages.message FROM messages \
+      var sql = 'SELECT messages.id, messages.message, users.username, rooms.roomname FROM messages \
                  LEFT OUTER JOIN users ON (messages.userid = users.id) \
                  LEFT OUTER JOIN rooms ON (messages.roomid = rooms.id) \
                  ORDER BY messages.id DESC';

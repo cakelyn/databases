@@ -9,7 +9,7 @@ module.exports = {
                  ORDER BY messages.id DESC';
       db.query(sql, function(err, res) {
         if (err) {
-          console.log(err);
+          console.log('MODELS error getting messages from DB: ', err.sqlMessage);
         } else {
           callback(res);
         }
@@ -28,7 +28,7 @@ module.exports = {
 
       db.query(sql, params, function(err, res) {
         if (err) {
-          console.log('error inserting message in DB',err);
+          console.log('MODELS error inserting message into DB: ',err);
         } else {
           callback(null, res);
         }
@@ -43,7 +43,7 @@ module.exports = {
       // query the database for users
       db.query('SELECT * FROM users', function(err, res) {
         if (err) {
-          console.log(err);
+          console.log('MODELS error getting users from DB: ', err.sqlMessage);
         } else {
           callback(res);
         }
@@ -56,7 +56,7 @@ module.exports = {
 
       db.query(sql, params, function(err, res) {
         if (err) {
-          console.log('error inserting username', err);
+          console.log('MODELS error inserting username into DB: ', err.sqlMessage);
         } else {
           callback(null, res);
         }
@@ -70,7 +70,7 @@ module.exports = {
       // query the database for users
       db.query('SELECT * FROM rooms', function(err, res) {
         if (err) {
-          console.log(err);
+          console.log('MODELS error getting rooms from DB: ', err.sqlMessage);
         } else {
           callback(res);
         }
@@ -80,10 +80,15 @@ module.exports = {
     post: function (params, callback) {
 
       var sql = 'INSERT INTO rooms (roomname) VALUE (?)';
+      var mysql_err_dup_entry = 1062;
 
       db.query(sql, params, function(err, res) {
+        if (err && err.errno === mysql_err_dup_entry) {
+          consolelog('Please enter a unqiue roomname. ' + params + ' already exists.');
+          callback(null, res);
+        }
         if (err) {
-          console.log('error inserting roomname', err);
+          console.log('MODELS error inserting roomname into DB: ', err.sqlMessage);
         } else {
           callback(null, res);
         }
@@ -91,4 +96,3 @@ module.exports = {
     }
   }
 };
-

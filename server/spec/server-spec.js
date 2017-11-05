@@ -16,11 +16,16 @@ describe('Persistent Node Chat Server', function() {
     });
     dbConnection.connect();
 
-       var tablename = "messages"; // TODO: fill this out
+       var msgtable = "messages"; // TODO: fill this out
+       var usertable = "users";
+       var roomstable = "rooms";
+
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query('truncate ' + tablename, done);
+    dbConnection.query('truncate ' + msgtable);
+    dbConnection.query('truncate ' + usertable);
+    dbConnection.query('truncate ' + roomstable, done);
   });
 
   afterEach(function() {
@@ -38,41 +43,41 @@ describe('Persistent Node Chat Server', function() {
       // Post the room to the chat server:
       request({
         method: 'POST',
-        uri: 'http://127.0.0.1:3000/classes/users',
+        uri: 'http://127.0.0.1:3000/classes/rooms',
         json: { roomname: 'Hello' }
       }, function() {
-      // Post a message to the node chat server:
-      request({
-        method: 'POST',
-        uri: 'http://127.0.0.1:3000/classes/messages',
-        json: {
-          username: 'Valjean',
-          message: 'In mercy\'s name, three days is all I need.',
-          roomname: 'Hello'
-        }
-      }, function () {
-        // Now if we look in the database, we should find the
-        // posted message there.
+        // Post a message to the node chat server:
+        request({
+          method: 'POST',
+          uri: 'http://127.0.0.1:3000/classes/messages',
+          json: {
+            username: 'Valjean',
+            message: 'In mercy\'s name, three days is all I need.',
+            roomname: 'Hello'
+          }
+        }, function () {
+          // Now if we look in the database, we should find the
+          // posted message there.
 
-        // TODO: You might have to change this test to get all the data from
-        // your message table, since this is schema-dependent.
+          // TODO: You might have to change this test to get all the data from
+          // your message table, since this is schema-dependent.
 
-        var queryString = 'SELECT message FROM messages';
-        var queryArgs = [];
+          var queryString = 'SELECT message FROM messages';
+          var queryArgs = [];
 
-        dbConnection.query(queryString, queryArgs, function(err, results) {
-          // Should have one result:
-          expect(results.length).to.equal(1);
+          dbConnection.query(queryString, queryArgs, function(err, results) {
+            // Should have one result:
+            expect(results.length).to.equal(1);
 
-          // TODO: If you don't have a column named text, change this test.
-          expect(results[0].message).to.equal('In mercy\'s name, three days is all I need.');
+            // TODO: If you don't have a column named text, change this test.
+            expect(results[0].message).to.equal('In mercy\'s name, three days is all I need.');
 
-          done();
+            done();
+          });
         });
       });
     });
   });
-});
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
@@ -93,5 +98,37 @@ describe('Persistent Node Chat Server', function() {
         done();
       });
     });
+  });
+
+  it('Should only add unique rooms to DB', function(done) {
+    request({
+      method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/rooms',
+      json: { roomname: 'forest' }
+    }, function() {
+      request({
+        method: 'POST',
+        uri: 'http://127.0.0.1:3000/classes/rooms',
+        json: { roomname: 'forest' }
+      }, function() {
+        var queryString = 'SELECT roomname FROM rooms WHERE roomname="forest"';
+        var queryArgs = [];
+
+        dbConnection.query(queryString, queryArgs, function(err) {
+
+          request('http://127.0.0.1:3000/classes/rooms', function(error, response, body) {
+            var roomLog = JSON.parse(body);
+            expect(roomLog.length).to.equal(1);
+            done();
+          });
+        });
+      });
+    });
+
+
+  });
+
+  xit('Should only add unique names to DB', function(done) {
+
   });
 });

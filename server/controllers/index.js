@@ -11,7 +11,7 @@ module.exports = {
       var params = [req.body.message, req.body.username, req.body.roomname];
       models.messages.post(params, function(err, results) {
         if (err) {
-          console.log('error posting to controller', err);
+          console.log('CONTROLLER error posting message: ', err.sqlMessage);
         }
         res.sendStatus(201);
       });
@@ -29,7 +29,7 @@ module.exports = {
       var params = [req.body.username];
       models.users.post(params, function(err, results) {
         if (err) {
-          console.log('error posting username to controller', err);
+          console.log('CONTROLLER error posting username: ', err.sqlMessage);
         }
         res.sendStatus(201);
       });
@@ -47,7 +47,7 @@ module.exports = {
       var params = [req.body.roomname];
       models.rooms.post(params, function(err, results) {
         if (err) {
-          console.log('error posting rooms to controller', err);
+          console.log('CONTROLLER error posting roomname: ', err.sqlMessage);
         }
         res.sendStatus(201);
       });

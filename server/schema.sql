@@ -20,11 +20,9 @@ CREATE TABLE messages (
   /* Describe your table here.*/
   id INT NOT NULL AUTO_INCREMENT,
   userid INT NOT NULL,
-  message VARCHAR(140),
+  message VARCHAR(140) NOT NULL,
   roomid INT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (userid) REFERENCES users(id),
-  FOREIGN KEY (roomid) REFERENCES rooms(id)
+  PRIMARY KEY (id)
 
 );
 

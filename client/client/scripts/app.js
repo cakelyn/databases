@@ -1,10 +1,3 @@
-$(document).ready(function() {
-
-  // initialize app when document is ready
-  app.init();
-
-});
-
 var app = {
   // set up app variables
   server: 'http://127.0.0.1:3000/',
@@ -34,9 +27,9 @@ var app = {
     app.fetch(false);
 
     // continually check for new messages
-    setInterval(function() {
-      app.fetch(true);
-    }, 3000);
+    // setInterval(function() {
+    //   app.fetch(true);
+    // }, 3000);
   },
 
   send: function(message) {
@@ -240,3 +233,10 @@ var app = {
   }
 
 };
+
+$(document).ready(function() {
+
+  // initialize app when document is ready
+  app.init();
+
+});

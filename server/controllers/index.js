@@ -1,56 +1,61 @@
-var models = require('../models');
+var db = require('../db');
 
 module.exports = {
   messages: {
     get: function (req, res) { // a function which handles a get request for all messages
-      models.messages.get(function(data) {
-        res.send(data);
-      });
+      db.Message.findAll({ include: [db.User, db.Room] })
+        .then(function(message) {
+          res.json(message);
+        });
     },
     post: function (req, res) { // a function which handles posting a message to the database
-      var params = [req.body.message, req.body.username, req.body.roomname];
-      models.messages.post(params, function(err, results) {
-        if (err) {
-          console.log('CONTROLLER error posting message: ', err.sqlMessage);
-        }
-        res.sendStatus(201);
-      });
+      db.User.findOrCreate({ where: {username: req.body.username} })
+        .spread(function(user, created) {
+          db.Room.findOrCreate({ where: {roomname: req.body.roomname} })
+          .spread(function(room, created) {
+            console.log('------------------->creating');
+            db.Message.create({
+              UserId: user.get('id'),
+              message: req.body.message,
+              RoomId: room.get('id')
+            })
+            .then(function(message) {
+              res.sendStatus(201);
+            });
+          });
+        });
     }
   },
 
   users: {
     // Ditto as above
     get: function (req, res) {
-      models.users.get(function(data) {
-        res.send(data);
-      });
+      db.User.findAll()
+        .then(function(users) {
+          res.json(users);
+        });
     },
     post: function (req, res) {
-      var params = [req.body.username];
-      models.users.post(params, function(err, results) {
-        if (err) {
-          console.log('CONTROLLER error posting username: ', err.sqlMessage);
-        }
-        res.sendStatus(201);
-      });
+      db.User.findOrCreate({ where: {username: req.body.username} })
+        .spread(function(user, created) {
+          res.sendStatus(created ? 201 : 200);
+        });
     }
   },
+
   rooms: {
     // Ditto as above
     get: function (req, res) {
-      models.rooms.get(function(data) {
-        res.send(data);
-      });
+      db.Room.findAll()
+        .then(function(rooms) {
+          res.json(rooms);
+        });
     },
     post: function (req, res ) {
-     console.log('room received by server = ',req.body);
-      var params = [req.body.roomname];
-      models.rooms.post(params, function(err, results) {
-        if (err) {
-          console.log('CONTROLLER error posting roomname: ', err.sqlMessage);
-        }
-        res.sendStatus(201);
-      });
+      db.Room.findOrCreate({where: {roomname: req.body.roomname} })
+        .spread(function(user, created) {
+          res.sendStatus(created ? 201 : 200);
+        });
     }
   }
 

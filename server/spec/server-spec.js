@@ -16,9 +16,9 @@ describe('Persistent Node Chat Server', function() {
     });
     dbConnection.connect();
 
-       var msgtable = "messages"; // TODO: fill this out
-       var usertable = "users";
-       var roomstable = "rooms";
+    var msgtable = 'messages'; // TODO: fill this out
+    var usertable = 'users';
+    var roomstable = 'rooms';
 
 
     /* Empty the db table before each test so that multiple tests
@@ -81,8 +81,8 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-       var queryString = 'INSERT INTO messages (message, userid, roomid) VALUE (?, ?, ?)';
-       var queryArgs = ['Men like you can never change!', 1, 1];
+    var queryString = 'INSERT INTO messages (message, userid, roomid) VALUE (?, ?, ?)';
+    var queryArgs = ['Men like you can never change!', 1, 1];
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
@@ -100,7 +100,7 @@ describe('Persistent Node Chat Server', function() {
     });
   });
 
-  it('Should only add unique rooms to DB', function(done) {
+  it('Should only add unique roomnames to DB', function(done) {
     request({
       method: 'POST',
       uri: 'http://127.0.0.1:3000/classes/rooms',
@@ -124,11 +124,32 @@ describe('Persistent Node Chat Server', function() {
         });
       });
     });
-
-
   });
 
-  xit('Should only add unique names to DB', function(done) {
+  it('Should only add unique usernames to DB', function(done) {
+    request({
+      method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/users',
+      json: { username: 'Finn' }
+    }, function() {
+      request({
+        method: 'POST',
+        uri: 'http://127.0.0.1:3000/classes/users',
+        json: { username: 'Finn' }
+      }, function() {
+        var queryString = 'SELECT username FROM users WHERE username="Finn"';
+        var queryArgs = [];
 
+        dbConnection.query(queryString, queryArgs, function(err) {
+
+          request('http://127.0.0.1:3000/classes/users', function(error, response, body) {
+            var userLog = JSON.parse(body);
+            expect(userLog.length).to.equal(1);
+            done();
+          });
+        });
+      });
+    });
   });
+
 });

@@ -28,7 +28,7 @@ module.exports = {
 
       db.query(sql, params, function(err, res) {
         if (err) {
-          console.log('MODELS error inserting message into DB: ',err);
+          console.log('MODELS error inserting message into DB: ', err);
         } else {
           callback(null, res);
         }
@@ -53,8 +53,13 @@ module.exports = {
     post: function (params, callback) {
 
       var sql = 'INSERT INTO users (username) VALUE (?)';
+      var mysqlErrDupEntry = 1062;
 
       db.query(sql, params, function(err, res) {
+        if (err && err.errno === mysqlErrDupEntry) {
+          console.log('Please enter a unqiue username. ' + params + ' already exists.');
+          callback(null, res);
+        }
         if (err) {
           console.log('MODELS error inserting username into DB: ', err.sqlMessage);
         } else {
@@ -80,11 +85,11 @@ module.exports = {
     post: function (params, callback) {
 
       var sql = 'INSERT INTO rooms (roomname) VALUE (?)';
-      var mysql_err_dup_entry = 1062;
+      var mysqlErrDupEntry = 1062;
 
       db.query(sql, params, function(err, res) {
-        if (err && err.errno === mysql_err_dup_entry) {
-          consolelog('Please enter a unqiue roomname. ' + params + ' already exists.');
+        if (err && err.errno === mysqlErrDupEntry) {
+          console.log('Please enter a unqiue roomname. ' + params + ' already exists.');
           callback(null, res);
         }
         if (err) {

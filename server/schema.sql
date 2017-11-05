@@ -6,13 +6,13 @@ USE chat;
 
 CREATE TABLE users (
   id INT NOT NULL AUTO_INCREMENT,
-  username VARCHAR(15),
+  username VARCHAR(15) NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE rooms (
   id INT NOT NULL AUTO_INCREMENT,
-  roomname VARCHAR(15),
+  roomname VARCHAR(15) NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
 
